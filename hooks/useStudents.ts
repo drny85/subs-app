@@ -1,3 +1,4 @@
+'use client';
 import { db } from '@/firebase';
 import { Student } from '@/types';
 import { useUser } from '@clerk/nextjs';

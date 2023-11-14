@@ -7,24 +7,40 @@ import {
    TableBody,
    TableRow,
    TableCell,
-   getKeyValue,
    Pagination,
    Tooltip,
    Button,
    Input,
    SortDescriptor,
+   Modal,
+   ModalHeader,
+   ModalBody,
+   ModalFooter,
+   ModalContent,
+   useDisclosure,
 } from '@nextui-org/react';
 import { useStudents } from '@/hooks/useStudents';
 import { Student } from '@/types';
 import { AiFillDelete } from 'react-icons/ai';
-import { BiSearch } from 'react-icons/bi';
+import { BiSearch, BiEditAlt } from 'react-icons/bi';
+import { useRouter } from 'next/navigation';
+import Loading from '../Loading';
 
 const StudentsTable = () => {
-   const { students } = useStudents();
+   const { students, loading } = useStudents();
+   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+
+   const router = useRouter();
    const [page, setPage] = useState(1);
    const [filterValue, setFilterValue] = useState('');
    const hasSearchFilter = Boolean(filterValue);
    const [rowsPerPage, setRowsPerPage] = useState(10);
+   const goToStudentPage = (id: string) => router.push(`/students/${id}`);
+   const onDeleteStudent = (id: string) => {
+      try {
+         onClose();
+      } catch (error) {}
+   };
 
    const filteredItems = useMemo(() => {
       let filteredStudents = [...students];
@@ -81,10 +97,11 @@ const StudentsTable = () => {
             <div className='flex items-end justify-between gap-3'>
                <Input
                   isClearable
-                  className='w-full sm:max-w-[60%]'
-                  placeholder='Search by name...'
+                  className='w-full sm:max-w-[100%]'
+                  placeholder='Search by name or last name'
                   startContent={<BiSearch />}
                   value={filterValue}
+                  size='md'
                   onClear={() => onClear()}
                   onValueChange={onSearchChange}
                />
@@ -100,49 +117,84 @@ const StudentsTable = () => {
          { key: 'actions', label: 'Actions' },
       ];
    }, []);
-   const renderCell = React.useCallback(
-      (student: Student, columnKey: React.Key) => {
-         const cellValue = student[columnKey as keyof Student];
+   type S = Pick<Student, 'id' | 'name' | 'lastName' | 'userId'>;
+   const renderCell = React.useCallback((student: S, columnKey: React.Key) => {
+      const cellValue = student[columnKey as keyof S];
 
-         switch (columnKey) {
-            case 'name':
-               return (
-                  <div>
-                     <p className='text-bold text-lg capitalize'>
-                        {student.name}
-                     </p>
-                  </div>
-               );
-            case 'lastName':
-               return (
-                  <div className='flex flex-col'>
-                     <p className='text-bold text-lg capitalize'>
-                        {student.lastName}
-                     </p>
-                  </div>
-               );
+      switch (columnKey) {
+         case 'name':
+            return (
+               <div>
+                  <p className='text-bold text-lg capitalize'>{student.name}</p>
+               </div>
+            );
+         case 'lastName':
+            return (
+               <div className='flex flex-col'>
+                  <p className='text-bold text-lg capitalize'>
+                     {student.lastName}
+                  </p>
+               </div>
+            );
 
-            case 'actions':
-               return (
-                  <div className='relative flex items-center justify-center gap-4'>
-                     <Tooltip color='danger' content='Delete Student'>
-                        <span className='text-lg text-danger cursor-pointer active:opacity-50'>
-                           <AiFillDelete size={30} />
-                        </span>
-                     </Tooltip>
-                     <Tooltip content='View Student'>
-                        <span className='text-lg text-default-400 cursor-pointer active:opacity-50'>
-                           <Button color='secondary'>View</Button>
+         case 'actions':
+            return (
+               <div className='relative flex items-center justify-start gap-5'>
+                  <div className='hidden md:block'>
+                     <Tooltip color='warning' content='Edit Student'>
+                        <span className='text-lg text-gray-500 cursor-pointer active:opacity-50'>
+                           <BiEditAlt size={24} />
                         </span>
                      </Tooltip>
                   </div>
-               );
-            default:
-               return cellValue;
-         }
-      },
-      []
-   );
+                  <Tooltip color='danger' content='Delete Student'>
+                     <span className='text-lg text-danger cursor-pointer active:opacity-50'>
+                        <Button isIconOnly color='danger' onPress={onOpen}>
+                           <AiFillDelete size={24} />
+                        </Button>
+
+                        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+                           <ModalContent>
+                              <ModalHeader className='flex flex-col gap-1'>
+                                 Delete Student
+                              </ModalHeader>
+                              <ModalBody>
+                                 <p>
+                                    Are you sure you want to delete this
+                                    student?
+                                 </p>
+                              </ModalBody>
+                              <ModalFooter>
+                                 <Button>Cancel</Button>
+                                 <Button
+                                    color='danger'
+                                    onPress={() => onDeleteStudent(student.id!)}
+                                 >
+                                    Delete
+                                 </Button>
+                              </ModalFooter>
+                           </ModalContent>
+                        </Modal>
+                     </span>
+                  </Tooltip>
+                  <Tooltip content='View Student'>
+                     <span className='text-lg text-default-400 cursor-pointer active:opacity-50'>
+                        <Button
+                           onClick={() => goToStudentPage(student.id!)}
+                           color='secondary'
+                        >
+                           View
+                        </Button>
+                     </span>
+                  </Tooltip>
+               </div>
+            );
+         default:
+            return cellValue;
+      }
+   }, []);
+
+   if (loading) return <Loading />;
 
    return (
       <Table
@@ -150,6 +202,9 @@ const StudentsTable = () => {
          selectionMode='single'
          aria-label='Example table with custom cells'
          topContent={topContent}
+         classNames={{
+            wrapper: 'min-h-[222px]',
+         }}
          bottomContent={
             <div className='flex justify-center w-full'>
                <Pagination
@@ -173,7 +228,7 @@ const StudentsTable = () => {
                <TableColumn
                   allowsSorting={column.key !== 'actions'}
                   key={column.key}
-                  align={'end'}
+                  align={'center'}
                >
                   {column.label}
                </TableColumn>
