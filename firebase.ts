@@ -14,12 +14,7 @@ import { Anecdotal, Student, Subscription } from './types';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-   apiKey: 'AIzaSyBm2rXewvnGfXC995-BMeTu4ySeOQMrVzU',
-   authDomain: 'students-5bf85.firebaseapp.com',
-   projectId: 'students-5bf85',
-   storageBucket: 'students-5bf85.appspot.com',
-   messagingSenderId: '959214587888',
-   appId: '1:959214587888:web:c860cb7cce873e28319735',
+  
 };
 
 export const createCollection = <T = DocumentData>(collectionName: string) => {
