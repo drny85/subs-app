@@ -10,17 +10,14 @@ import {
    useDisclosure,
    Input,
 } from '@nextui-org/react';
-
+import { IoMdPersonAdd } from 'react-icons/io';
 import { Student } from '@/types.js';
 import { useUser } from '@clerk/nextjs';
 import { toast } from 'react-hot-toast';
 import { Fields } from '@/data';
 import { onAddStudent } from '@/firebaseFunctions/students';
-type Props = {
-   onEdit?: (student: Student) => void;
-};
 
-const AddStudentModal = ({ onEdit }: Props) => {
+const AddStudentModal = () => {
    const { user, isLoaded } = useUser();
    if (!isLoaded || !user) return null;
    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
@@ -42,7 +39,11 @@ const AddStudentModal = ({ onEdit }: Props) => {
 
    return (
       <>
-         <Button onPress={onOpen} color='primary'>
+         <Button
+            startContent={<IoMdPersonAdd size={24} />}
+            onPress={onOpen}
+            color='secondary'
+         >
             Add Student
          </Button>
          <Modal
@@ -64,6 +65,7 @@ const AddStudentModal = ({ onEdit }: Props) => {
                            label='First Name'
                            placeholder='John'
                            autoCapitalize='words'
+                           className='capitalize'
                            variant='underlined'
                            onChange={(e) =>
                               setStudent({ ...student, name: e.target.value })
@@ -73,6 +75,7 @@ const AddStudentModal = ({ onEdit }: Props) => {
                            isRequired
                            defaultValue={student.lastName}
                            label='Last Name'
+                           className='capitalize'
                            placeholder='Smith'
                            value={student.lastName}
                            autoCapitalize='words'

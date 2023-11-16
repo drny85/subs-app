@@ -5,6 +5,9 @@ import { Toaster } from 'react-hot-toast';
 import FirebaseProvider from '@/providers/FirebaseProvider';
 import { ClerkProvider } from '@clerk/nextjs';
 import NextUiProvider from '@/providers/NextUiProvider';
+import SubscriptionProvider from '@/providers/SubscriptionProvider';
+import NavBar from '@/components/NavBar';
+import { SWRConfig } from "swr";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,19 +22,26 @@ export default function RootLayout({
    children: React.ReactNode;
 }) {
    return (
+     
       <ClerkProvider>
+        
          <html lang='en'>
             <body className={inter.className}>
                <FirebaseProvider>
                   <NextUiProvider>
-                     <main className='max-w-2xl mx-auto'>
-                        {children}
-                        <Toaster />
-                     </main>
+                     <SubscriptionProvider>
+                        <main className='max-w-3xl mx-auto'>
+                           <NavBar />
+                           {children}
+                           <Toaster />
+                        </main>
+                     </SubscriptionProvider>
                   </NextUiProvider>
                </FirebaseProvider>
             </body>
          </html>
+         
       </ClerkProvider>
+   
    );
 }

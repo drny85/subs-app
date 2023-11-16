@@ -14,6 +14,10 @@ export const useStudent = (id: string) => {
       }
       const docRef = doc(studentsCollection, id);
       const sub = onSnapshot(docRef, (snap) => {
+         if (!snap.exists()) {
+            setLoading(false);
+            return;
+         }
          setStudent({ id: snap.id, ...snap.data() } as Student);
          setLoading(false);
       });

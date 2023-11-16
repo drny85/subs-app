@@ -1,7 +1,7 @@
 'use client';
 import { subscriptionsRef } from '@/converters/Subcription';
 import { initFirebase } from '@/firebase';
-import { Role } from '@/types';
+import { Role, Subscription } from '@/types';
 import {
    addDoc,
    collection,
@@ -28,7 +28,7 @@ export const getCheckoutUrl = async (
 
    const docRef = await addDoc(checkoutSessionRef, {
       price: priceId,
-      success_url: window.location.origin,
+      success_url: window.location.origin + '/subscription',
       cancel_url: window.location.origin,
    });
 
@@ -62,7 +62,7 @@ export const getPortalUrl = async (userId: string): Promise<string> => {
       );
       const { data } = await functionRef({
          customerId: userId,
-         returnUrl: window.location.origin,
+         returnUrl: window.location.origin + '/subscription',
       });
 
       // Add a type to the data
@@ -89,7 +89,7 @@ export const getPremiumStatus = async (userId: string) => {
       where('status', 'in', ['trialing', 'active'])
    );
 
-   return new Promise<Role>((resolve, reject) => {
+   return new Promise<Subscription | null>((resolve, reject) => {
       const unsubscribe = onSnapshot(
          q,
          (snapshot) => {
@@ -101,7 +101,7 @@ export const getPremiumStatus = async (userId: string) => {
             } else {
                console.log('Active or trialing subscription found');
 
-               resolve(snapshot.docs[0].data().role as Role);
+               resolve(snapshot.docs[0].data());
             }
             unsubscribe();
          },

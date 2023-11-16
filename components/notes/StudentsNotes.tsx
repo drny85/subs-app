@@ -79,8 +79,8 @@ const AnecdotalNotes = ({ fields }: Props) => {
                                     value={f.value}
                                     onChange={(e) => onChange(e, f.name)}
                                     rows={5}
-                                    className='my-2 placeholder:text-red-600'
-                                    role='textbox'
+                                    variant='bordered'
+                                    className='my-2 placeholder:text-gray-400'
                                  />
                               </div>
                            </div>

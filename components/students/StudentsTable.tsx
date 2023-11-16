@@ -21,25 +21,50 @@ import {
 } from '@nextui-org/react';
 import { useStudents } from '@/hooks/useStudents';
 import { Student } from '@/types';
-import { AiFillDelete } from 'react-icons/ai';
+import { useUser } from '@clerk/nextjs';
+import { MdOutlineDelete } from 'react-icons/md';
 import { BiSearch, BiEditAlt } from 'react-icons/bi';
 import { useRouter } from 'next/navigation';
 import Loading from '../Loading';
+import { onDeleteStudent, onUpdateStudent } from '@/firebaseFunctions/students';
+import { capitalizeString } from '@/utils/capitalizeString';
+import Link from 'next/link';
+import { useSubscription } from '@/providers/store';
 
 const StudentsTable = () => {
+   const subscription = useSubscription((s) => s.subscription);
    const { students, loading } = useStudents();
+   const [student, setStudent] = useState<Student | null>(null);
+   const [edit, setEdit] = useState(false);
    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-
    const router = useRouter();
    const [page, setPage] = useState(1);
    const [filterValue, setFilterValue] = useState('');
    const hasSearchFilter = Boolean(filterValue);
-   const [rowsPerPage, setRowsPerPage] = useState(10);
-   const goToStudentPage = (id: string) => router.push(`/students/${id}`);
-   const onDeleteStudent = (id: string) => {
-      try {
+   const [rowsPerPage, setRowsPerPage] = useState(8);
+
+   const onEditSave = async () => {
+      if (!student) return;
+      const updated = await onUpdateStudent(student);
+      if (updated) {
+         setEdit(false);
+         setStudent(null);
          onClose();
-      } catch (error) {}
+      }
+   };
+   const onDeleteStudentPress = async () => {
+      try {
+         if (!student) return;
+
+         const deleted = await onDeleteStudent(student.id!);
+         if (deleted) {
+            setStudent(null);
+            onClose();
+         }
+         //onClose();
+      } catch (error) {
+         console.log('Error deleting student', error);
+      }
    };
 
    const filteredItems = useMemo(() => {
@@ -58,7 +83,7 @@ const StudentsTable = () => {
    const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-      column: 'name',
+      column: 'name' || 'lastName',
       direction: 'ascending',
    });
    const items = useMemo(() => {
@@ -114,7 +139,7 @@ const StudentsTable = () => {
       return [
          { key: 'name', label: 'Name' },
          { key: 'lastName', label: 'Last Name' },
-         { key: 'actions', label: 'Actions' },
+         { key: 'actions', label: '' },
       ];
    }, []);
    type S = Pick<Student, 'id' | 'name' | 'lastName' | 'userId'>;
@@ -139,52 +164,42 @@ const StudentsTable = () => {
 
          case 'actions':
             return (
-               <div className='relative flex items-center justify-start gap-5'>
+               <div className='relative flex items-center w-full justify-center gap-5'>
                   <div className='hidden md:block'>
                      <Tooltip color='warning' content='Edit Student'>
                         <span className='text-lg text-gray-500 cursor-pointer active:opacity-50'>
-                           <BiEditAlt size={24} />
+                           <Button
+                              onClick={() => {
+                                 console.log('Edit');
+                                 setStudent(student);
+                                 setEdit(true);
+                              }}
+                              isIconOnly
+                              variant='ghost'
+                           >
+                              <BiEditAlt size={24} />
+                           </Button>
                         </span>
                      </Tooltip>
                   </div>
                   <Tooltip color='danger' content='Delete Student'>
                      <span className='text-lg text-danger cursor-pointer active:opacity-50'>
-                        <Button isIconOnly color='danger' onPress={onOpen}>
-                           <AiFillDelete size={24} />
+                        <Button isIconOnly color='danger' variant='ghost'>
+                           <MdOutlineDelete
+                              onClick={() => {
+                                 setStudent(student);
+                                 onOpen();
+                              }}
+                              size={24}
+                           />
                         </Button>
-
-                        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-                           <ModalContent>
-                              <ModalHeader className='flex flex-col gap-1'>
-                                 Delete Student
-                              </ModalHeader>
-                              <ModalBody>
-                                 <p>
-                                    Are you sure you want to delete this
-                                    student?
-                                 </p>
-                              </ModalBody>
-                              <ModalFooter>
-                                 <Button>Cancel</Button>
-                                 <Button
-                                    color='danger'
-                                    onPress={() => onDeleteStudent(student.id!)}
-                                 >
-                                    Delete
-                                 </Button>
-                              </ModalFooter>
-                           </ModalContent>
-                        </Modal>
                      </span>
                   </Tooltip>
                   <Tooltip content='View Student'>
                      <span className='text-lg text-default-400 cursor-pointer active:opacity-50'>
-                        <Button
-                           onClick={() => goToStudentPage(student.id!)}
-                           color='secondary'
-                        >
-                           View
-                        </Button>
+                        <Link href={`/students/${student.id}`}>
+                           <Button color='default'>View</Button>
+                        </Link>
                      </span>
                   </Tooltip>
                </div>
@@ -196,54 +211,155 @@ const StudentsTable = () => {
 
    if (loading) return <Loading />;
 
+   if (subscription === null) {
+      router.back();
+   }
+
+   if (subscription && subscription?.status !== 'active') {
+      return (
+         <div className='flex flex-col gap-4'>
+            <p className='text-lg text-red-500'>
+               You are currently in trial mode. Please upgrade your plan to
+               continue using this feature.
+            </p>
+            <Link href='/subscription'>
+               <Button color='primary'>Upgrade Plan</Button>
+            </Link>
+         </div>
+      );
+   }
    return (
-      <Table
-         color='primary'
-         selectionMode='single'
-         aria-label='Example table with custom cells'
-         topContent={topContent}
-         classNames={{
-            wrapper: 'min-h-[222px]',
-         }}
-         bottomContent={
-            <div className='flex justify-center w-full'>
-               <Pagination
-                  showControls
-                  showShadow
-                  color='secondary'
-                  isCompact
-                  page={page}
-                  total={pages}
-                  onChange={(p) => {
-                     setPage(p);
-                  }}
-               />
-            </div>
-         }
-         sortDescriptor={sortDescriptor}
-         onSortChange={setSortDescriptor}
-      >
-         <TableHeader columns={columns}>
-            {(column) => (
-               <TableColumn
-                  allowsSorting={column.key !== 'actions'}
-                  key={column.key}
-                  align={'center'}
-               >
-                  {column.label}
-               </TableColumn>
-            )}
-         </TableHeader>
-         <TableBody items={sortedItems}>
-            {(item) => (
-               <TableRow key={item.id}>
-                  {(columnKey) => (
-                     <TableCell>{renderCell(item, columnKey)}</TableCell>
-                  )}
-               </TableRow>
-            )}
-         </TableBody>
-      </Table>
+      <>
+         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+            <ModalContent>
+               <ModalHeader className='flex flex-col gap-1'>
+                  Delete Student
+               </ModalHeader>
+               <ModalBody>
+                  <p>Are you sure you want to delete this student?</p>
+               </ModalBody>
+               <ModalFooter>
+                  <Button
+                     onPress={() => {
+                        setStudent(null);
+                        onClose();
+                     }}
+                  >
+                     Cancel
+                  </Button>
+                  <Button color='danger' onPress={onDeleteStudentPress}>
+                     Delete
+                  </Button>
+               </ModalFooter>
+            </ModalContent>
+         </Modal>
+         <Modal
+            isOpen={edit}
+            onOpenChange={() => setEdit((e) => !e)}
+            placement='top-center'
+         >
+            <ModalContent>
+               {(onClose) => (
+                  <>
+                     <ModalHeader className='flex flex-col gap-1'>
+                        Update Student
+                     </ModalHeader>
+                     <ModalBody className='space-y-4'>
+                        <Input
+                           isRequired
+                           defaultValue={student?.name!}
+                           autoFocus
+                           label='First Name'
+                           placeholder='John'
+                           autoCapitalize='words'
+                           value={student?.name}
+                           className='capitalize'
+                           variant='underlined'
+                           onChange={(e) =>
+                              setStudent({
+                                 ...student!,
+                                 name: capitalizeString(e.target.value),
+                              })
+                           }
+                        />
+                        <Input
+                           isRequired
+                           defaultValue={student?.lastName}
+                           label='Last Name'
+                           className='capitalize'
+                           placeholder='Smith'
+                           value={student?.lastName}
+                           autoCapitalize='words'
+                           onChange={(e) =>
+                              setStudent({
+                                 ...student!,
+                                 lastName: capitalizeString(e.target.value),
+                              })
+                           }
+                           variant='underlined'
+                        />
+                     </ModalBody>
+                     <ModalFooter>
+                        <Button color='danger' variant='flat' onPress={onClose}>
+                           Cancel
+                        </Button>
+                        <Button color='primary' onPress={onEditSave}>
+                           Update Student
+                        </Button>
+                     </ModalFooter>
+                  </>
+               )}
+            </ModalContent>
+         </Modal>
+
+         <Table
+            color='primary'
+            selectionMode='single'
+            aria-label='Example table with custom cells'
+            topContent={topContent}
+            classNames={{
+               wrapper: 'min-h-[222px]',
+            }}
+            bottomContent={
+               <div className='flex justify-center w-full'>
+                  <Pagination
+                     showControls
+                     showShadow
+                     color='secondary'
+                     isCompact
+                     page={page}
+                     total={pages}
+                     onChange={(p) => {
+                        setPage(p);
+                     }}
+                  />
+               </div>
+            }
+            sortDescriptor={sortDescriptor}
+            onSortChange={setSortDescriptor}
+         >
+            <TableHeader columns={columns}>
+               {(column) => (
+                  <TableColumn
+                     allowsSorting={column.key !== 'actions'}
+                     key={column.key}
+                     align={column.key === 'actions' ? 'center' : 'end'}
+                  >
+                     {column.label}
+                  </TableColumn>
+               )}
+            </TableHeader>
+            <TableBody items={sortedItems}>
+               {(item) => (
+                  <TableRow key={item.id}>
+                     {(columnKey) => (
+                        <TableCell>{renderCell(item, columnKey)}</TableCell>
+                     )}
+                  </TableRow>
+               )}
+            </TableBody>
+         </Table>
+      </>
    );
 };
 
