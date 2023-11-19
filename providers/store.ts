@@ -1,24 +1,31 @@
 import { Subscription } from '@/types';
-import { User } from 'firebase/auth';
 import { create } from 'zustand';
-
-type UserState = {
-   user: User | null;
-   setUser: (user: User | null) => void;
-};
 
 type SubscriptionState = {
    subscription: Subscription | null | undefined;
    setSubscription: (subscription: Subscription | null) => void;
 };
 
-export const useUserStore = create<UserState>((set) => ({
-   user: null,
-   setUser: (user: User | null) => set({ user }),
-}));
+type ModalState = {
+   isOpen: boolean;
+   setIsOpen: (isOpen: boolean) => void;
+};
 
 export const useSubscription = create<SubscriptionState>((set) => ({
    subscription: null,
    setSubscription: (subscription: Subscription | null) =>
       set({ subscription }),
+}));
+
+export const useStudentsCount = create<{
+   total: number;
+   setTotal: (total: number) => void;
+}>((set) => ({
+   total: 0,
+   setTotal: (total: number) => set({ total }),
+}));
+
+export const useModalState = create<ModalState>((set) => ({
+   isOpen: false,
+   setIsOpen: (isOpen: boolean) => set({ isOpen }),
 }));

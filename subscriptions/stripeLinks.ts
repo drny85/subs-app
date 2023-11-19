@@ -1,7 +1,7 @@
 'use client';
 import { subscriptionsRef } from '@/converters/Subcription';
 import { initFirebase } from '@/firebase';
-import { Role, Subscription } from '@/types';
+import { Subscription } from '@/types';
 import {
    addDoc,
    collection,
@@ -28,7 +28,7 @@ export const getCheckoutUrl = async (
 
    const docRef = await addDoc(checkoutSessionRef, {
       price: priceId,
-      success_url: window.location.origin + '/subscription',
+      success_url: window.location.origin + '/students',
       cancel_url: window.location.origin,
    });
 
@@ -62,7 +62,7 @@ export const getPortalUrl = async (userId: string): Promise<string> => {
       );
       const { data } = await functionRef({
          customerId: userId,
-         returnUrl: window.location.origin + '/subscription',
+         returnUrl: window.location.origin + '/students',
       });
 
       // Add a type to the data

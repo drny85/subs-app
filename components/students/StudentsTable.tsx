@@ -21,7 +21,6 @@ import {
 } from '@nextui-org/react';
 import { useStudents } from '@/hooks/useStudents';
 import { Student } from '@/types';
-import { useUser } from '@clerk/nextjs';
 import { MdOutlineDelete } from 'react-icons/md';
 import { BiSearch, BiEditAlt } from 'react-icons/bi';
 import { useRouter } from 'next/navigation';
@@ -30,6 +29,7 @@ import { onDeleteStudent, onUpdateStudent } from '@/firebaseFunctions/students';
 import { capitalizeString } from '@/utils/capitalizeString';
 import Link from 'next/link';
 import { useSubscription } from '@/providers/store';
+type PageSelection = 5 | 10 | 15 | 20;
 
 const StudentsTable = () => {
    const subscription = useSubscription((s) => s.subscription);
@@ -41,7 +41,7 @@ const StudentsTable = () => {
    const [page, setPage] = useState(1);
    const [filterValue, setFilterValue] = useState('');
    const hasSearchFilter = Boolean(filterValue);
-   const [rowsPerPage, setRowsPerPage] = useState(8);
+   const [rowsPerPage, setRowsPerPage] = useState<PageSelection>(10);
 
    const onEditSave = async () => {
       if (!student) return;
@@ -321,19 +321,21 @@ const StudentsTable = () => {
                wrapper: 'min-h-[222px]',
             }}
             bottomContent={
-               <div className='flex justify-center w-full'>
-                  <Pagination
-                     showControls
-                     showShadow
-                     color='secondary'
-                     isCompact
-                     page={page}
-                     total={pages}
-                     onChange={(p) => {
-                        setPage(p);
-                     }}
-                  />
-               </div>
+               sortedItems.length > 0 && (
+                  <div className='flex justify-evenly w-full items-center'>
+                     <Pagination
+                        showControls
+                        showShadow
+                        color='secondary'
+                        isCompact
+                        page={page}
+                        total={pages}
+                        onChange={(p) => {
+                           setPage(p);
+                        }}
+                     />
+                  </div>
+               )
             }
             sortDescriptor={sortDescriptor}
             onSortChange={setSortDescriptor}
@@ -349,7 +351,7 @@ const StudentsTable = () => {
                   </TableColumn>
                )}
             </TableHeader>
-            <TableBody items={sortedItems}>
+            <TableBody items={sortedItems} emptyContent='No Students Added'>
                {(item) => (
                   <TableRow key={item.id}>
                      {(columnKey) => (

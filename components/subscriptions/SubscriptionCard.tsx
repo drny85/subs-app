@@ -1,7 +1,7 @@
 'use client';
 import { getCheckoutUrl, getPortalUrl } from '@/subscriptions/stripeLinks';
 import { Subscription, SubscriptionData } from '@/types';
-import { useUser } from '@clerk/nextjs';
+
 import {
    Button,
    Card,
@@ -9,8 +9,9 @@ import {
    CardFooter,
    CardHeader,
 } from '@nextui-org/react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { IoMdCheckmark } from 'react-icons/io';
 const SubscriptionCard = ({
    sub,
@@ -19,21 +20,24 @@ const SubscriptionCard = ({
    sub: SubscriptionData;
    currentSub: Subscription;
 }) => {
-   const { user } = useUser();
+   const { data: session } = useSession();
    const [loading, setLoading] = useState(false);
 
    const plan = currentSub && currentSub?.role === sub.id;
-   const onUpgrade = async () => {
+   const onUpgrade = useCallback(async () => {
       try {
+         if (!session) return;
          setLoading(true);
          if (currentSub) {
-            const url = await getPortalUrl(user?.id!);
+            const url = await getPortalUrl(session.user.id!);
             if (url) {
                window.location.assign(url);
             }
          } else {
-            if (!user) return;
-            const checkoutUrl = await getCheckoutUrl(user?.id, sub.priceId);
+            const checkoutUrl = await getCheckoutUrl(
+               session.user?.id,
+               sub.priceId
+            );
             if (checkoutUrl) {
                window.location.assign(checkoutUrl);
             }
@@ -43,7 +47,7 @@ const SubscriptionCard = ({
       } finally {
          setLoading(false);
       }
-   };
+   }, [session]);
 
    return (
       <Card className='w-full px-3 sm:max-w-[250px] md:max-[380px]:'>

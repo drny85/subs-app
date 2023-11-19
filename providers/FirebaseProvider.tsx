@@ -1,38 +1,29 @@
 'use client';
 import { PropsWithChildren, useEffect } from 'react';
 
-import { signInWithCustomToken, updateCurrentUser } from 'firebase/auth';
+import { signInWithCustomToken, signOut } from 'firebase/auth';
 
-import { useAuth, useUser } from '@clerk/nextjs';
 import { auth } from '@/firebase';
+import { Session } from 'next-auth';
+import { useSession } from 'next-auth/react';
+
+async function signInWith(session: Session) {
+   if (session && session.firebaseToken) {
+      try {
+         await signInWithCustomToken(auth, session.firebaseToken);
+      } catch (error) {}
+   } else {
+      signOut(auth);
+   }
+}
 
 const FirebaseProvider = ({ children }: PropsWithChildren) => {
-   const { getToken } = useAuth();
-   const { user } = useUser();
+   const { data: session } = useSession();
    useEffect(() => {
-      const signInWithClerk = async () => {
-         const token = await getToken({ template: 'integration_firebase' });
-         if (!token) return;
-         await signInWithCustomToken(auth, token);
-         if (
-            user?.emailAddresses &&
-            user.emailAddresses.length > 0 &&
-            auth.currentUser
-         ) {
-            await updateCurrentUser(auth, {
-               ...auth.currentUser!,
-               email: user.emailAddresses[0].emailAddress || null,
-            });
-         }
+      if (!session) return;
 
-         /**
-          * The userCredentials.user object will call the methods of
-          * the Firebase platform as an authenticated user.
-          */
-      };
-
-      signInWithClerk();
-   }, []);
+      signInWith(session);
+   }, [session]);
 
    return <>{children}</>;
 };

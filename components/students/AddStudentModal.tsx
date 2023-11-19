@@ -1,30 +1,34 @@
 'use client';
-import React, { useState } from 'react';
-import {
-   Modal,
-   ModalContent,
-   ModalHeader,
-   ModalBody,
-   ModalFooter,
-   Button,
-   useDisclosure,
-   Input,
-} from '@nextui-org/react';
-import { IoMdPersonAdd } from 'react-icons/io';
-import { Student } from '@/types.js';
-import { useUser } from '@clerk/nextjs';
-import { toast } from 'react-hot-toast';
 import { Fields } from '@/data';
 import { onAddStudent } from '@/firebaseFunctions/students';
+import { useStudentsCount, useSubscription } from '@/providers/store';
+import { Student } from '@/types.js';
+import { capitalizeString } from '@/utils/capitalizeString';
+import {
+   Button,
+   Input,
+   Modal,
+   ModalBody,
+   ModalContent,
+   ModalFooter,
+   ModalHeader,
+   useDisclosure,
+} from '@nextui-org/react';
+import { useSession } from 'next-auth/react';
+import { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { IoMdPersonAdd } from 'react-icons/io';
 
 const AddStudentModal = () => {
-   const { user, isLoaded } = useUser();
-   if (!isLoaded || !user) return null;
+   const { data: session } = useSession();
+   if (!session) return null;
+   const studentsTotal = useStudentsCount((s) => s.total);
+   const subs = useSubscription((s) => s.subscription);
    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
    const [student, setStudent] = useState<Student>({
       name: '',
       lastName: '',
-      userId: user?.id,
+      userId: session.user.id,
       fields: [...Fields],
    });
    const onSave = async () => {
@@ -34,14 +38,34 @@ const AddStudentModal = () => {
       }
       await onAddStudent(student);
       console.log('saved');
+      setStudent({
+         name: '',
+         lastName: '',
+         userId: session.user.id,
+         fields: [...Fields],
+      });
       onClose();
+   };
+
+   const handleAddStudent = () => {
+      if (studentsTotal >= 2 && !subs) {
+         toast.error('You can only add 2 students');
+
+         return;
+      }
+      if (subs && subs.status !== 'active') {
+         toast.error('You must be a paid member to add students');
+
+         return;
+      }
+      onOpen();
    };
 
    return (
       <>
          <Button
             startContent={<IoMdPersonAdd size={24} />}
-            onPress={onOpen}
+            onPress={handleAddStudent}
             color='secondary'
          >
             Add Student
@@ -64,25 +88,24 @@ const AddStudentModal = () => {
                            autoFocus
                            label='First Name'
                            placeholder='John'
-                           autoCapitalize='words'
-                           className='capitalize'
                            variant='underlined'
                            onChange={(e) =>
-                              setStudent({ ...student, name: e.target.value })
+                              setStudent({
+                                 ...student,
+                                 name: capitalizeString(e.target.value),
+                              })
                            }
                         />
                         <Input
                            isRequired
                            defaultValue={student.lastName}
                            label='Last Name'
-                           className='capitalize'
                            placeholder='Smith'
                            value={student.lastName}
-                           autoCapitalize='words'
                            onChange={(e) =>
                               setStudent({
                                  ...student,
-                                 lastName: e.target.value,
+                                 lastName: capitalizeString(e.target.value),
                               })
                            }
                            variant='underlined'

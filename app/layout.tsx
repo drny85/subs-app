@@ -1,13 +1,13 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { Toaster } from 'react-hot-toast';
+import NavBar from '@/components/NavBar';
 import FirebaseProvider from '@/providers/FirebaseProvider';
-import { ClerkProvider } from '@clerk/nextjs';
+import Provider from '@/providers/NextSessionProvider';
 import NextUiProvider from '@/providers/NextUiProvider';
 import SubscriptionProvider from '@/providers/SubscriptionProvider';
-import NavBar from '@/components/NavBar';
-import { SWRConfig } from "swr";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { Toaster } from 'react-hot-toast';
+import './globals.css';
+import SubscriptionModal from '@/components/subscriptions/SubscriptionModal';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,26 +22,23 @@ export default function RootLayout({
    children: React.ReactNode;
 }) {
    return (
-     
-      <ClerkProvider>
-        
-         <html lang='en'>
-            <body className={inter.className}>
+      <html lang='en'>
+         <body className={inter.className}>
+            <Provider>
                <FirebaseProvider>
                   <NextUiProvider>
                      <SubscriptionProvider>
-                        <main className='max-w-3xl mx-auto'>
+                        <main className='max-w-3xl mx-auto min-h-screen'>
                            <NavBar />
                            {children}
                            <Toaster />
+                           <SubscriptionModal />
                         </main>
                      </SubscriptionProvider>
                   </NextUiProvider>
                </FirebaseProvider>
-            </body>
-         </html>
-         
-      </ClerkProvider>
-   
+            </Provider>
+         </body>
+      </html>
    );
 }

@@ -1,12 +1,11 @@
 'use client';
-import AnecdotalNotes from '@/components/notes/StudentsNotes';
-import { useStudent } from '@/hooks/useStudent';
-import { useRouter } from 'next/navigation';
-import React from 'react';
-import { BsChevronLeft } from 'react-icons/bs';
-import { Button } from '@nextui-org/react';
-import UpdateNotes from '@/components/notes/UpdateNotes';
 import Loading from '@/components/Loading';
+import AnecdotalNotes from '@/components/notes/StudentsNotes';
+import UpdateNotes from '@/components/notes/UpdateNotes';
+import { useStudent } from '@/hooks/useStudent';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { BsChevronLeft } from 'react-icons/bs';
 
 const StudentPage = ({ params: { id } }: { params: { id: string } }) => {
    const router = useRouter();
@@ -18,12 +17,12 @@ const StudentPage = ({ params: { id } }: { params: { id: string } }) => {
       <div className='flex min-h-screen flex-col mx-auto py-2 w-full'>
          <div className='flex justify-between w-full'>
             <div
-               onClick={router.back}
+               onClick={() => router.push('/students')}
                className='flex gap-1 items-center cursor-pointer'
             >
-               <Button className='bg-white dark:bg-slate-700' isIconOnly>
-                  <BsChevronLeft size={26} />
-               </Button>
+               <Link href={'/students'}>
+                  <BsChevronLeft size={26} color='gray' />
+               </Link>
                <p>Back</p>
             </div>
 

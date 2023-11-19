@@ -1,17 +1,17 @@
 'use client';
 
 import { getPremiumStatus } from '@/subscriptions/stripeLinks';
-import { useUser } from '@clerk/nextjs';
+import { useSession } from 'next-auth/react';
 import { PropsWithChildren, useEffect } from 'react';
 import { useSubscription } from './store';
 
 const SubscriptionProvider = ({ children }: PropsWithChildren) => {
-   const { user } = useUser();
+   const { data: session } = useSession();
 
    const setSub = useSubscription((s) => s.setSubscription);
    useEffect(() => {
-      if (!user) return;
-      getPremiumStatus(user.id)
+      if (!session) return;
+      getPremiumStatus(session.user.id)
          .then((s) => {
             setSub(s);
          })
@@ -19,7 +19,7 @@ const SubscriptionProvider = ({ children }: PropsWithChildren) => {
             console.log(e);
             setSub(null);
          });
-   }, [user]);
+   }, [session?.user]);
    return <>{children}</>;
 };
 
