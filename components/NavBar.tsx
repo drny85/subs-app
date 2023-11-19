@@ -49,21 +49,22 @@ const NavBar = () => {
             </div>
             <div className='flex gap-4 items-center'>
                <ThemeSwitcher />
-               <Dropdown className='text-center'>
+               <Dropdown>
                   <DropdownTrigger>
                      <User
                         name={session.user.name}
-                        description={session.user.email}
                         avatarProps={{ src: session.user.image || '' }}
                      />
                   </DropdownTrigger>
                   <DropdownMenu aria-label='Static Actions'>
+                     <DropdownItem>{session.user.email}</DropdownItem>
                      <DropdownItem
                         onPress={() => openModal(true)}
                         textValue='Subscriptions'
                      >
                         Subscriptions
                      </DropdownItem>
+
                      <DropdownItem
                         color='danger'
                         key={'log-out'}

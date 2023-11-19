@@ -12,12 +12,7 @@ export default function SubscriptionModal() {
    if (subs === undefined) return <Loading />;
 
    return (
-      <Modal
-         size='3xl'
-         isOpen={isOpen}
-         onOpenChange={setIsOpen}
-         isDismissable={false}
-      >
+      <Modal size='3xl' isOpen={isOpen} onOpenChange={setIsOpen}>
          <ModalContent className='p-6'>
             <ModalHeader className='flex flex-col gap-1 text-center text-xl md:text-2xl my-4'>
                {subs && subs.status === 'active'
