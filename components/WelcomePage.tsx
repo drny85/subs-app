@@ -5,7 +5,7 @@ import { Button } from '@nextui-org/react';
 import { motion } from 'framer-motion';
 import { signIn, useSession } from 'next-auth/react';
 import React from 'react';
-import Loading from './Loading';
+
 import MemberPage from './MemberPage';
 import { useSearchParams } from 'next/navigation';
 
@@ -22,7 +22,10 @@ const WelcomePage = () => {
       return <MemberPage />;
    }
 
-   if (show) {
+   if (
+      (show && !subscription) ||
+      (subscription && subscription.status !== 'active')
+   ) {
       openModal(show);
    }
    return (
