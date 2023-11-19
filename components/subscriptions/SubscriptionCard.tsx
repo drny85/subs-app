@@ -11,7 +11,6 @@ import {
 } from '@nextui-org/react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { IoMdCheckmark } from 'react-icons/io';
 const SubscriptionCard = ({
@@ -23,7 +22,6 @@ const SubscriptionCard = ({
 }) => {
    const { data: session } = useSession();
    const [loading, setLoading] = useState(false);
-   const router = useRouter();
 
    const plan = currentSub && currentSub?.role === sub.id;
    const onUpgrade = useCallback(async () => {
@@ -53,7 +51,7 @@ const SubscriptionCard = ({
       } finally {
          setLoading(false);
       }
-   }, [session]);
+   }, [session, sub.priceId, currentSub]);
 
    return (
       <Card className='w-full px-3 sm:max-w-[250px] md:max-[380px]:'>
@@ -72,7 +70,7 @@ const SubscriptionCard = ({
 
             <div className='space-y-2 mt-3'>
                {sub.descriptions.map((d) => (
-                  <div className='flex gap-1 items-center'>
+                  <div className='flex gap-1 items-center' key={d}>
                      <IoMdCheckmark />
                      <p className='text-sm'>{d}</p>
                   </div>

@@ -27,7 +27,6 @@ interface Quote {
 const MemberPage = () => {
    const { data: session, status } = useSession();
    const router = useRouter();
-   if (status === 'loading') return <Loading />;
 
    const [quote, setQuote] = useState<Quote | null>(null);
 
@@ -45,6 +44,8 @@ const MemberPage = () => {
 
       fetchQuote();
    }, []);
+
+   if (status === 'loading') return <Loading />;
 
    return (
       <div
@@ -77,7 +78,7 @@ const MemberPage = () => {
                      style={{ lineHeight: 2 }}
                      className='text-xl my-4 font-thin italic'
                   >
-                     "{quote.content}"
+                     {quote.content}
                   </p>
                   <p className='text-light text-right mr-12 italic'>
                      --{quote.author}

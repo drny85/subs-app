@@ -30,7 +30,7 @@ const WelcomePage = () => {
          <div className='max-w-2xl p-6 bg-white'>
             <h1 className='text-3xl font-bold mb-4'>Welcome to My Notes App</h1>
             <p className='mb-6'>
-               Store and manage all your students' notes in one place.
+               Store and manage all your students notes in one place.
             </p>
             <div className='mb-8'>
                <h2 className='text-xl font-semibold mb-2'>Features:</h2>

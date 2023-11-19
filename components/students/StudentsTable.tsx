@@ -1,34 +1,33 @@
 'use client';
-import React, { useCallback, useMemo, useState } from 'react';
+import { onDeleteStudent, onUpdateStudent } from '@/firebaseFunctions/students';
+import { useStudents } from '@/hooks/useStudents';
+import { useSubscription } from '@/providers/store';
+import { Student } from '@/types';
+import { capitalizeString } from '@/utils/capitalizeString';
 import {
-   Table,
-   TableHeader,
-   TableColumn,
-   TableBody,
-   TableRow,
-   TableCell,
-   Pagination,
-   Tooltip,
    Button,
    Input,
-   SortDescriptor,
    Modal,
-   ModalHeader,
    ModalBody,
-   ModalFooter,
    ModalContent,
+   ModalFooter,
+   ModalHeader,
+   Pagination,
+   SortDescriptor,
+   Table,
+   TableBody,
+   TableCell,
+   TableColumn,
+   TableHeader,
+   TableRow,
+   Tooltip,
    useDisclosure,
 } from '@nextui-org/react';
-import { useStudents } from '@/hooks/useStudents';
-import { Student } from '@/types';
-import { MdOutlineDelete } from 'react-icons/md';
-import { BiSearch, BiEditAlt } from 'react-icons/bi';
-import { useRouter } from 'next/navigation';
-import Loading from '../Loading';
-import { onDeleteStudent, onUpdateStudent } from '@/firebaseFunctions/students';
-import { capitalizeString } from '@/utils/capitalizeString';
 import Link from 'next/link';
-import { useSubscription } from '@/providers/store';
+import React, { useCallback, useMemo, useState } from 'react';
+import { BiEditAlt, BiSearch } from 'react-icons/bi';
+import { MdOutlineDelete } from 'react-icons/md';
+import Loading from '../Loading';
 type PageSelection = 5 | 10 | 15 | 20;
 
 const StudentsTable = () => {
@@ -37,7 +36,6 @@ const StudentsTable = () => {
    const [student, setStudent] = useState<Student | null>(null);
    const [edit, setEdit] = useState(false);
    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-   const router = useRouter();
    const [page, setPage] = useState(1);
    const [filterValue, setFilterValue] = useState('');
    const hasSearchFilter = Boolean(filterValue);
@@ -143,73 +141,76 @@ const StudentsTable = () => {
       ];
    }, []);
    type S = Pick<Student, 'id' | 'name' | 'lastName' | 'userId'>;
-   const renderCell = React.useCallback((student: S, columnKey: React.Key) => {
-      const cellValue = student[columnKey as keyof S];
+   const renderCell = React.useCallback(
+      (student: S, columnKey: React.Key) => {
+         const cellValue = student[columnKey as keyof S];
 
-      switch (columnKey) {
-         case 'name':
-            return (
-               <div>
-                  <p className='text-bold text-lg capitalize'>{student.name}</p>
-               </div>
-            );
-         case 'lastName':
-            return (
-               <div className='flex flex-col'>
-                  <p className='text-bold text-lg capitalize'>
-                     {student.lastName}
-                  </p>
-               </div>
-            );
+         switch (columnKey) {
+            case 'name':
+               return (
+                  <div>
+                     <p className='text-bold text-lg capitalize'>
+                        {student.name}
+                     </p>
+                  </div>
+               );
+            case 'lastName':
+               return (
+                  <div className='flex flex-col'>
+                     <p className='text-bold text-lg capitalize'>
+                        {student.lastName}
+                     </p>
+                  </div>
+               );
 
-         case 'actions':
-            return (
-               <div className='relative flex items-center w-full justify-center gap-5'>
-                  <div className='hidden md:block'>
-                     <Tooltip color='warning' content='Edit Student'>
-                        <span className='text-lg text-gray-500 cursor-pointer active:opacity-50'>
-                           <Button
-                              onClick={() => {
-                                 console.log('Edit');
-                                 setStudent(student);
-                                 setEdit(true);
-                              }}
-                              isIconOnly
-                              variant='ghost'
-                           >
-                              <BiEditAlt size={24} />
+            case 'actions':
+               return (
+                  <div className='relative flex items-center w-full justify-center gap-5'>
+                     <div className='hidden md:block'>
+                        <Tooltip color='warning' content='Edit Student'>
+                           <span className='text-lg text-gray-500 cursor-pointer active:opacity-50'>
+                              <Button
+                                 onClick={() => {
+                                    console.log('Edit');
+                                    setStudent(student);
+                                    setEdit(true);
+                                 }}
+                                 isIconOnly
+                                 variant='ghost'
+                              >
+                                 <BiEditAlt size={24} />
+                              </Button>
+                           </span>
+                        </Tooltip>
+                     </div>
+                     <Tooltip color='danger' content='Delete Student'>
+                        <span className='text-lg text-danger cursor-pointer active:opacity-50'>
+                           <Button isIconOnly color='danger' variant='ghost'>
+                              <MdOutlineDelete
+                                 onClick={() => {
+                                    setStudent(student);
+                                    onOpen();
+                                 }}
+                                 size={24}
+                              />
                            </Button>
                         </span>
                      </Tooltip>
+                     <Tooltip content='View Student'>
+                        <span className='text-lg text-default-400 cursor-pointer active:opacity-50'>
+                           <Link href={`/students/${student.id}`}>
+                              <Button color='default'>View</Button>
+                           </Link>
+                        </span>
+                     </Tooltip>
                   </div>
-                  <Tooltip color='danger' content='Delete Student'>
-                     <span className='text-lg text-danger cursor-pointer active:opacity-50'>
-                        <Button isIconOnly color='danger' variant='ghost'>
-                           <MdOutlineDelete
-                              onClick={() => {
-                                 setStudent(student);
-                                 onOpen();
-                              }}
-                              size={24}
-                           />
-                        </Button>
-                     </span>
-                  </Tooltip>
-                  <Tooltip content='View Student'>
-                     <span className='text-lg text-default-400 cursor-pointer active:opacity-50'>
-                        <Link href={`/students/${student.id}`}>
-                           <Button color='default'>View</Button>
-                        </Link>
-                     </span>
-                  </Tooltip>
-               </div>
-            );
-         default:
-            return cellValue;
-      }
-   }, []);
-
-   if (loading) return <Loading />;
+               );
+            default:
+               return cellValue;
+         }
+      },
+      [onOpen]
+   );
 
    if (subscription && subscription?.status !== 'active') {
       return (
@@ -224,6 +225,7 @@ const StudentsTable = () => {
          </div>
       );
    }
+   if (loading) return <Loading />;
    return (
       <>
          <Modal isOpen={isOpen} onOpenChange={onOpenChange}>

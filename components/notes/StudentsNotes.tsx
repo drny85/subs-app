@@ -50,7 +50,7 @@ const AnecdotalNotes = ({ fields }: Props) => {
                         }
                      >
                         {c.subvalue.map((f, i) => (
-                           <div>
+                           <div key={i}>
                               <h2>
                                  {i + 1} - {f.name}
                               </h2>
@@ -61,7 +61,10 @@ const AnecdotalNotes = ({ fields }: Props) => {
                                     </p>
                                     <div className='flex space-x-3 p-2'>
                                        {f.focus.map((p, i) => (
-                                          <p className='text-sm text-gray-400'>
+                                          <p
+                                             className='text-sm text-gray-400'
+                                             key={i}
+                                          >
                                              {letters[i]}-{p}
                                           </p>
                                        ))}
