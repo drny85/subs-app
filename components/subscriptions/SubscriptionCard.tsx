@@ -11,6 +11,7 @@ import {
 } from '@nextui-org/react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { IoMdCheckmark } from 'react-icons/io';
 const SubscriptionCard = ({
@@ -22,6 +23,7 @@ const SubscriptionCard = ({
 }) => {
    const { data: session } = useSession();
    const [loading, setLoading] = useState(false);
+   const router = useRouter();
 
    const plan = currentSub && currentSub?.role === sub.id;
    const onUpgrade = useCallback(async () => {
@@ -31,7 +33,9 @@ const SubscriptionCard = ({
          if (currentSub) {
             const url = await getPortalUrl(session.user.id!);
             if (url) {
-               window.location.assign(url);
+               // window.location.assign(url);
+               //router.replace(url);
+               window.location.href = url;
             }
          } else {
             const checkoutUrl = await getCheckoutUrl(
@@ -39,7 +43,9 @@ const SubscriptionCard = ({
                sub.priceId
             );
             if (checkoutUrl) {
-               window.location.assign(checkoutUrl);
+               //window.location.assign(checkoutUrl);
+               //router.replace(checkoutUrl);
+               window.location.href = checkoutUrl;
             }
          }
       } catch (error) {

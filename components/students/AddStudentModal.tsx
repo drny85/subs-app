@@ -1,7 +1,11 @@
 'use client';
 import { Fields } from '@/data';
 import { onAddStudent } from '@/firebaseFunctions/students';
-import { useStudentsCount, useSubscription } from '@/providers/store';
+import {
+   useModalState,
+   useStudentsCount,
+   useSubscription,
+} from '@/providers/store';
 import { Student } from '@/types.js';
 import { capitalizeString } from '@/utils/capitalizeString';
 import {
@@ -21,17 +25,18 @@ import { IoMdPersonAdd } from 'react-icons/io';
 
 const AddStudentModal = () => {
    const { data: session } = useSession();
-   if (!session) return null;
+   const openModal = useModalState((s) => s.setIsOpen);
    const studentsTotal = useStudentsCount((s) => s.total);
    const subs = useSubscription((s) => s.subscription);
    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
    const [student, setStudent] = useState<Student>({
       name: '',
       lastName: '',
-      userId: session.user.id,
+      userId: session?.user.id!,
       fields: [...Fields],
    });
    const onSave = async () => {
+      if (!session) return;
       if (!student.name || !student.lastName) {
          toast.error('Both fields are required');
          return;
@@ -50,7 +55,7 @@ const AddStudentModal = () => {
    const handleAddStudent = () => {
       if (studentsTotal >= 2 && !subs) {
          toast.error('You can only add 2 students');
-
+         openModal(true);
          return;
       }
       if (subs && subs.status !== 'active') {

@@ -211,10 +211,6 @@ const StudentsTable = () => {
 
    if (loading) return <Loading />;
 
-   if (subscription === null) {
-      router.back();
-   }
-
    if (subscription && subscription?.status !== 'active') {
       return (
          <div className='flex flex-col gap-4'>

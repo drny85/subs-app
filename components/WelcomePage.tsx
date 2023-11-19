@@ -13,11 +13,10 @@ const WelcomePage = () => {
    const params = useSearchParams();
    const show = params.get('show') === 'true';
 
-   const { data: session, status } = useSession();
+   const { data: session } = useSession();
 
    const subscription = useSubscription((s) => s.subscription);
    const openModal = useModalState((s) => s.setIsOpen);
-   if (status === 'loading') return <Loading />;
 
    if (subscription && subscription.status === 'active' && session) {
       return <MemberPage />;
@@ -73,7 +72,7 @@ const WelcomePage = () => {
                         if (session) {
                            openModal(true);
                         } else {
-                           signIn('google', { callbackUrl: '/?show=true' });
+                           signIn('', { callbackUrl: '/?show=true' });
                         }
                      }}
                   >

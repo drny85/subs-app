@@ -1,10 +1,10 @@
-import { auth } from '@/firebase';
 import { FirestoreAdapter } from '@auth/firebase-adapter';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import type { AuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { firebaseAuth, firestoreAdmin } from './firestore';
+import EmailProvider from 'next-auth/providers/email';
+import FacebookProvider from 'next-auth/providers/facebook';
+import { sendVerificationRequest } from '@/utils/sendVerificationRequest';
 
 export const authOptions: AuthOptions = {
    providers: [
@@ -19,33 +19,18 @@ export const authOptions: AuthOptions = {
             },
          },
       }),
-      CredentialsProvider({
-         name: 'credentials',
-         credentials: {
-            email: { label: 'Email', type: 'text' },
-            password: { label: 'Password', type: 'password' },
-         },
-         async authorize(credentials) {
-            if (!credentials || !credentials.email || !credentials.password) {
-               return null;
-            }
 
-            try {
-               const { user } = await signInWithEmailAndPassword(
-                  auth,
-                  credentials.email,
-                  credentials.password
-               );
-               if (!user) return null;
-               return { ...user, id: user.uid };
-            } catch (error) {
-               console.log(error);
-               console.log('Error signing in with email and password');
-
-               return null;
-            }
-         },
-      }),
+      // EmailProvider({
+      //    server: process.env.EMAIL_SERVER,
+      //    from: process.env.EMAIL_FROM,
+      // }),
+      //@ts-ignore
+      {
+         id: 'resend',
+         type: 'email',
+         name: 'Email',
+         sendVerificationRequest,
+      },
    ],
    callbacks: {
       session: async ({ session, token }) => {
@@ -69,5 +54,8 @@ export const authOptions: AuthOptions = {
    adapter: FirestoreAdapter(firestoreAdmin),
    session: {
       strategy: 'jwt',
+   },
+   pages: {
+      verifyRequest: '/verify-email',
    },
 };

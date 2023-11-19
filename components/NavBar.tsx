@@ -28,7 +28,7 @@ const NavBar = () => {
 
    return (
       <>
-         <nav className='flex gap-4 justify-between py-3 mb-2 px-4 sm:px-1'>
+         <nav className='flex space-x-10 justify-between py-3 mb-2 px-4 sm:px-1'>
             <div className='flex gap-6'>
                {links.map((link, index) => {
                   return (
@@ -37,7 +37,7 @@ const NavBar = () => {
                         className={
                            path.replace(/\//g, '') ===
                            link.path.replace(/\//g, '')
-                              ? 'border-b-2 border-slate-500 font-semibold hover:scale-105 transition-all'
+                              ? 'border-b-2 border-slate-500 px-6 font-semibold hover:scale-105 transition-all'
                               : 'hover:scale-105 transition-all'
                         }
                         href={link.path}
