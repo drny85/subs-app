@@ -50,7 +50,7 @@ const MemberPage = () => {
    return (
       <div
          className={cn(
-            'flex flex-col mx-auto items-center justify-center  absolute top-80 max-w-2xl',
+            'flex flex-col mx-auto items-center justify-center  p-4 absolute top-80 max-w-2xl',
             play.className
          )}
       >

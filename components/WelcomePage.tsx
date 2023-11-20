@@ -4,11 +4,12 @@ import { useModalState, useSubscription } from '@/providers/store';
 import { Button } from '@nextui-org/react';
 import { motion } from 'framer-motion';
 import { signIn, useSession } from 'next-auth/react';
-import React from 'react';
+import { Roboto } from 'next/font/google';
 
 import MemberPage from './MemberPage';
 import { useSearchParams } from 'next/navigation';
-
+import { cn } from '@/utils/cn';
+const roboto = Roboto({ subsets: ['latin'], weight: ['500', '700', '900'] });
 const WelcomePage = () => {
    const params = useSearchParams();
    const show = params.get('show') === 'true';
@@ -29,9 +30,16 @@ const WelcomePage = () => {
       openModal(show);
    }
    return (
-      <div className='min-h-screen flex my-8 md:mt-12 justify-center w-full text-gray-700'>
+      <div
+         className={cn(
+            'min-h-full flex my-8 md:py-12 justify-center w-full text-gray-700 mb-20',
+            roboto.className
+         )}
+      >
          <div className='max-w-2xl p-6 bg-white'>
-            <h1 className='text-3xl font-bold mb-4'>Welcome to My Notes App</h1>
+            <h1 className='text-2xl md:text-3xl text-center font-bold mb-4'>
+               Welcome to My Notes App
+            </h1>
             <p className='mb-6'>
                Store and manage all your students notes in one place.
             </p>
@@ -69,7 +77,7 @@ const WelcomePage = () => {
                <div className='flex mt-10 justify-center'>
                   <Button
                      size='lg'
-                     variant='flat'
+                     variant='solid'
                      color='secondary'
                      onPress={() => {
                         if (session) {
