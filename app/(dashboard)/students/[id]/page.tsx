@@ -38,7 +38,7 @@ const StudentPage = ({ params: { id } }: { params: { id: string } }) => {
 
    return (
       <div className='flex min-h-screen flex-col mx-auto py-2 w-full'>
-         <div className='flex justify-between w-full'>
+         <div className='flex justify-between w-full items-center'>
             <div
                onClick={() => router.push('/students')}
                className='flex gap-1 items-center cursor-pointer'

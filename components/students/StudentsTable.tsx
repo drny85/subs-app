@@ -319,7 +319,8 @@ const StudentsTable = () => {
                wrapper: 'min-h-[222px]',
             }}
             bottomContent={
-               sortedItems.length > 0 && (
+               sortedItems.length > 0 &&
+               sortedItems.length > rowsPerPage && (
                   <div className='flex justify-evenly w-full items-center'>
                      <Pagination
                         showControls

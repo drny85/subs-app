@@ -6,13 +6,15 @@ import {
    DropdownItem,
    DropdownMenu,
    DropdownTrigger,
+   Tooltip,
    User,
 } from '@nextui-org/react';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import ThemeSwitcher from './ThemeSwitcher';
-import { useModalState } from '@/providers/store';
+import { useModalState, useSubscription } from '@/providers/store';
+import { FaStarOfDavid } from 'react-icons/fa';
 
 const links: { label: string; path: string }[] = [
    { label: 'Home', path: '/' },
@@ -23,6 +25,7 @@ const NavBar = () => {
    const { data: session } = useSession();
    const path = usePathname();
    const openModal = useModalState((s) => s.setIsOpen);
+   const subs = useSubscription((s) => s.subscription);
 
    if (!session) return null;
 
@@ -48,6 +51,19 @@ const NavBar = () => {
                })}
             </div>
             <div className='flex gap-4 items-center'>
+               {subs && subs.role === 'premium' && subs.status === 'active' && (
+                  <div>
+                     <Tooltip
+                        content='PRO Member'
+                        placement='bottom'
+                        color='secondary'
+                     >
+                        <Button isIconOnly>
+                           <FaStarOfDavid size={24} />
+                        </Button>
+                     </Tooltip>
+                  </div>
+               )}
                <ThemeSwitcher />
                <Dropdown>
                   <DropdownTrigger>
