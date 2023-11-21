@@ -37,8 +37,8 @@ const StudentPage = ({ params: { id } }: { params: { id: string } }) => {
    }
 
    return (
-      <div className='flex min-h-screen flex-col mx-auto py-2 w-full'>
-         <div className='flex justify-between w-full items-center'>
+      <div className='flex flex-col mx-auto py-2 w-full'>
+         <div className='flex sticky top-20 z-50 max-w-3xl justify-between w-full items-center shadow-md'>
             <div
                onClick={() => router.push('/students')}
                className='flex gap-1 items-center cursor-pointer'
@@ -49,13 +49,15 @@ const StudentPage = ({ params: { id } }: { params: { id: string } }) => {
                <p>Back</p>
             </div>
 
-            <h1 className='capitalize text-md md:text-xl text-center'>
+            <h1 className='capitalize text-md md:text-xl text-center font-semibold'>
                Notes For {student.name} {student.lastName}
             </h1>
+
             <UpdateNotes fields={student.fields!} studentId={student.id!} />
          </div>
-
-         <AnecdotalNotes fields={student.fields!} />
+         <div className='mt-12'>
+            <AnecdotalNotes fields={student.fields!} />
+         </div>
       </div>
    );
 };

@@ -98,7 +98,7 @@ const ModernAnalogClock: React.FC<ModernAnalogClockProps> = ({ size }) => {
             secondHandLength={secondHandLength}
             hourMarksLength={hourMarksLength}
             minuteMarksLength={minuteMarksLength}
-            className='react-clock-custom  bg-white rounded-full' // Custom class for styling
+            className='react-clock-custom  bg-white rounded-full text-purple-500 text-xl font-semibold' // Custom class for styling
          />
       </div>
    );

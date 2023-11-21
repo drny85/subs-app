@@ -1,7 +1,7 @@
 'use client';
 import {
+   Avatar,
    Button,
-   Divider,
    Dropdown,
    DropdownItem,
    DropdownMenu,
@@ -30,88 +30,85 @@ const NavBar = () => {
    if (!session) return null;
 
    return (
-      <>
-         <nav className='flex space-x-10 justify-between py-3 mb-2 px-4 sm:px-1'>
-            <div className='flex gap-6'>
-               {links.map((link, index) => {
-                  return (
-                     <Link
-                        key={index}
-                        className={
-                           path.replace(/\//g, '') ===
-                           link.path.replace(/\//g, '')
-                              ? 'border-b-2 border-slate-500 px-6 font-semibold hover:scale-105 transition-all'
-                              : 'hover:scale-105 transition-all'
-                        }
-                        href={link.path}
-                     >
-                        {link.label}
-                     </Link>
-                  );
-               })}
-            </div>
-            <div className='flex gap-4 items-center'>
-               {subs && subs.role === 'premium' && subs.status === 'active' && (
-                  <div>
-                     <Tooltip
-                        content='PRO Member'
-                        placement='bottom'
-                        color='secondary'
-                     >
-                        <Button isIconOnly>
-                           <FaStarOfDavid size={24} />
-                        </Button>
-                     </Tooltip>
-                  </div>
-               )}
-               <ThemeSwitcher />
-               <Dropdown>
-                  <DropdownTrigger>
-                     <User
-                        name={
-                           session.user.name
-                              ? session.user.name.split(' ')[0]
-                              : ''
-                        }
-                        avatarProps={{ src: session.user.image || '' }}
-                     />
-                  </DropdownTrigger>
-                  <DropdownMenu aria-label='Static Actions'>
-                     <DropdownItem>{session.user.email}</DropdownItem>
-                     <DropdownItem
-                        onPress={() => openModal(true)}
-                        textValue='Subscriptions'
-                     >
-                        Subscriptions
-                     </DropdownItem>
-                     <DropdownItem textValue='Contact Us'>
-                        <Link href={'/contact'}>Contact Us</Link>
-                     </DropdownItem>
+      <nav className='flex w-full fixed top-0 justify-between z-20 items-center max-w-2xl shadow-sm py-3 mb-2 px-4 sm:px-1'>
+         <div className='flex gap-6'>
+            {links.map((link, index) => {
+               return (
+                  <Link
+                     key={index}
+                     className={
+                        path.replace(/\//g, '') === link.path.replace(/\//g, '')
+                           ? 'border-b-2 border-slate-500 px-6 font-semibold hover:scale-105 transition-all'
+                           : 'hover:scale-105 transition-all'
+                     }
+                     href={link.path}
+                  >
+                     {link.label}
+                  </Link>
+               );
+            })}
+         </div>
+         <div className='flex gap-4 items-center'>
+            {subs && subs.role === 'premium' && subs.status === 'active' && (
+               <div>
+                  <Tooltip
+                     content='PRO Member'
+                     placement='bottom'
+                     color='secondary'
+                  >
+                     <Button isIconOnly>
+                        <FaStarOfDavid size={24} />
+                     </Button>
+                  </Tooltip>
+               </div>
+            )}
+            <ThemeSwitcher />
+            <Dropdown>
+               <DropdownTrigger>
+                  <Avatar
+                     src={session.user.image ? session.user.image : ''}
+                     alt='Image'
+                  />
+               </DropdownTrigger>
+               <DropdownMenu aria-label='Static Actions'>
+                  <DropdownItem textValue='name'>
+                     {session.user.name}
+                  </DropdownItem>
+                  <DropdownItem textValue='email'>
+                     {session.user.email}
+                  </DropdownItem>
+                  <DropdownItem
+                     onPress={() => openModal(true)}
+                     textValue='Subscriptions'
+                  >
+                     Subscriptions
+                  </DropdownItem>
+                  <DropdownItem textValue='Contact Us'>
+                     <Link href={'/contact'}>Contact Us</Link>
+                  </DropdownItem>
 
-                     <DropdownItem
-                        color='danger'
-                        key={'log-out'}
-                        textValue='Sign Out'
-                        variant='light'
+                  <DropdownItem
+                     color='danger'
+                     key={'log-out'}
+                     textValue='Sign Out'
+                     variant='light'
+                  >
+                     <Button
+                        size='sm'
+                        onPress={() =>
+                           signOut({
+                              callbackUrl: '/',
+                           })
+                        }
+                        variant='ghost'
                      >
-                        <Button
-                           size='sm'
-                           onPress={() =>
-                              signOut({
-                                 callbackUrl: '/',
-                              })
-                           }
-                           variant='ghost'
-                        >
-                           Log Out
-                        </Button>
-                     </DropdownItem>
-                  </DropdownMenu>
-               </Dropdown>
-            </div>
-         </nav>
-         <Divider />
-      </>
+                        Log Out
+                     </Button>
+                  </DropdownItem>
+               </DropdownMenu>
+            </Dropdown>
+         </div>
+      </nav>
    );
 };
 

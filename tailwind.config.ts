@@ -13,7 +13,11 @@ const config: Config = {
       nextui({
          themes: {
             light: {},
-            dark: {},
+            dark: {
+               colors: {
+                  background: '#001d3d',
+               },
+            },
          },
       }),
    ],
