@@ -68,7 +68,11 @@ const NavBar = () => {
                <Dropdown>
                   <DropdownTrigger>
                      <User
-                        name={session.user.name}
+                        name={
+                           session.user.name
+                              ? session.user.name.split(' ')[0]
+                              : ''
+                        }
                         avatarProps={{ src: session.user.image || '' }}
                      />
                   </DropdownTrigger>
