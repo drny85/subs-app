@@ -1,4 +1,4 @@
-import { FieldValues, Subscription, SubscriptionData } from './types';
+import { FieldValues, SubscriptionData } from './types';
 
 export const Fields: FieldValues[] = [
    {

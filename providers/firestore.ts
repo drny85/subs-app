@@ -1,12 +1,11 @@
 import { initFirestore } from '@auth/firebase-adapter';
-import { cert } from 'firebase-admin/app';
 import admin from 'firebase-admin';
 
 let app;
 
-if (!admin.apps.length) {
+if (admin.apps.length === 0) {
    app = admin.initializeApp({
-      credential: cert({
+      credential: admin.credential.cert({
          projectId: process.env.FIREBASE_PROJECT_ID,
          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
          privateKey: process.env.FIREBASE_PRIVATE_KEY,
@@ -15,7 +14,7 @@ if (!admin.apps.length) {
 }
 
 export const firestoreAdmin = initFirestore({
-   credential: cert({
+   credential: admin.credential.cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       privateKey: process.env.FIREBASE_PRIVATE_KEY,

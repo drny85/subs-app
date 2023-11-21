@@ -1,10 +1,8 @@
+import { sendVerificationRequest } from '@/utils/sendVerificationRequest';
 import { FirestoreAdapter } from '@auth/firebase-adapter';
 import type { AuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { firebaseAuth, firestoreAdmin } from './firestore';
-import EmailProvider from 'next-auth/providers/email';
-import FacebookProvider from 'next-auth/providers/facebook';
-import { sendVerificationRequest } from '@/utils/sendVerificationRequest';
 
 export const authOptions: AuthOptions = {
    providers: [
@@ -19,11 +17,6 @@ export const authOptions: AuthOptions = {
             },
          },
       }),
-
-      // EmailProvider({
-      //    server: process.env.EMAIL_SERVER,
-      //    from: process.env.EMAIL_FROM,
-      // }),
       //@ts-ignore
       {
          id: 'resend',

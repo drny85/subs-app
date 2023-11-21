@@ -4,12 +4,15 @@ import Provider from '@/providers/NextSessionProvider';
 import NextUiProvider from '@/providers/NextUiProvider';
 import SubscriptionProvider from '@/providers/SubscriptionProvider';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Montserrat } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import './globals.css';
 import SubscriptionModal from '@/components/subscriptions/SubscriptionModal';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Montserrat({
+   subsets: ['latin'],
+   weight: ['400', '700', '500', '900'],
+});
 
 export const metadata: Metadata = {
    title: 'My Students Notes',

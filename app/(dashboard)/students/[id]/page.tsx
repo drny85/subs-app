@@ -14,7 +14,7 @@ const StudentPage = ({ params: { id } }: { params: { id: string } }) => {
    const subs = useSubscription((s) => s.subscription);
    const openModal = useModalState((s) => s.setIsOpen);
    const { student, loading } = useStudent(id);
-   if (loading) return <Loading />;
+   if (loading || subs === undefined) return <Loading />;
    if (!student) return null;
 
    if (!subs || (subs && subs.status !== 'active')) {

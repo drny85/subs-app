@@ -9,6 +9,8 @@ import { Button } from '@nextui-org/react';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import AnalogClock from './AnalogClock';
+import ModernAnalogClock from './AnalogClock';
 const play = Playfair_Display({
    subsets: ['latin'],
    weight: ['400', '500', '600', '700', '800', '900'],
@@ -56,10 +58,11 @@ const MemberPage = () => {
       >
          <motion.div
             initial={{ opacity: 0, translateX: -100 }}
-            animate={{ opacity: 1, translateX: 0, translateY: -60 }}
+            animate={{ opacity: 1, translateX: 0, translateY: -80 }}
             transition={{ duration: 0.7, delay: 1 }}
          >
-            <p className='text-xl md:text-3xl font-semibold'>
+            <ModernAnalogClock size='md' />
+            <p className='text-xl md:text-3xl font-semibold text-center my-4'>
                Welcome Back {session?.user.name}
             </p>
          </motion.div>

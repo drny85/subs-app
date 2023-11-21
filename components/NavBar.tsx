@@ -80,6 +80,9 @@ const NavBar = () => {
                      >
                         Subscriptions
                      </DropdownItem>
+                     <DropdownItem textValue='Contact Us'>
+                        <Link href={'/contact'}>Contact Us</Link>
+                     </DropdownItem>
 
                      <DropdownItem
                         color='danger'
