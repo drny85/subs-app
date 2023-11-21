@@ -80,7 +80,6 @@ const ModernAnalogClock: React.FC<ModernAnalogClockProps> = ({ size }) => {
       secondHandWidth,
       hourMarksLength,
       minuteMarksLength,
-      secondMarksLength,
    } = sizeConfig[size];
 
    return (
@@ -99,7 +98,6 @@ const ModernAnalogClock: React.FC<ModernAnalogClockProps> = ({ size }) => {
             secondHandLength={secondHandLength}
             hourMarksLength={hourMarksLength}
             minuteMarksLength={minuteMarksLength}
-            secondMarksLength={secondMarksLength}
             className='react-clock-custom  bg-white rounded-full' // Custom class for styling
          />
       </div>
